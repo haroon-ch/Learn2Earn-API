@@ -32,7 +32,6 @@ $app = new \Slim\App([
                 $response->getBody()->write(json_encode($responseData));
             });
 
-
         //  all students get
         $app->get('/getStudents/{c_id}' ,function (Request $request, Response $response)
         {   $c_id = $request->getAttribute('c_id');

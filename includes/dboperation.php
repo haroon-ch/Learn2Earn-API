@@ -130,14 +130,14 @@ class DbOperation
             } 
 
                 //  Students admission 
-            function insertStudents($c_id,$a_id,$name,$f_name, $st_gender, $contact_no,$address, $reference,	$cnic, $course,$c_duration,$a_month, $total_fee,$installment_no,$first_installment_no, $advance,$remaning_amount)
+            function insertStudents($c_id,$a_id,$name,$f_name, $st_gender, $contact_no,$address, $reference,$cnic, $course,$c_duration,$a_month, $total_fee,$installment_no,$first_installment_no, $advance,$remaning_amount)
             {       
                 $status="pending";
                 $st_status="active";
                 // $first_installment_no=0;
                 $amount=0;
                 $stmt=$this->con->prepare("INSERT INTO `a_student` (`c_id`,`a_id`,`name`, `f_name`, `st_gender`, `contact_no`, `address`, `reference`, `cnic`, `course`, `c_duration`,`a_month`, `total_fee`,`installment_no`,`first_installment_no`,`advance`,`remaning_amount`,`status`,`st_status`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-                $stmt->bind_param("iissssssssssiiiiiss",$c_id,$a_id, $name,$f_name, $st_gender, $contact_no,$address, $reference,	$cnic, $course,$c_duration,$a_month,$total_fee,$installment_no,$first_installment_no, $advance,$remaning_amount,$status,$st_status);
+                $stmt->bind_param("iisssssssssssiiiiiss",$c_id,$a_id, $name,$f_name, $st_gender, $contact_no,$address, $reference,$cnic, $course,$c_duration,$a_month,$total_fee,$installment_no,$first_installment_no, $advance,$remaning_amount,$status,$st_status);
                 if ($stmt->execute())
                 {
                     $stmt = $this->con->prepare("SELECT netbalance FROM main_account where a_id = (select MAX(a_id) from main_account)");
