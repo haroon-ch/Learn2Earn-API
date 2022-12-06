@@ -63,6 +63,7 @@ $app = new \Slim\App([
             $course=$requestData->course;
             $c_duration=$requestData->c_duration;
             $a_month=$requestData->a_month;
+            $ad_date=$requestData->ad_date;
             $total_fee=$requestData->total_fee;
             $installment_no=$requestData->installment_no;
             $first_installment_no=$requestData->first_installment_no;
@@ -70,11 +71,11 @@ $app = new \Slim\App([
             $remaning_amount=$requestData->remaning_amount;
                 $db = new DbOperation();
                 $responseData = array();
-                    if($db->insertStudents($c_id,$a_id, $name, $f_name, $st_gender, $contact_no, $address, $reference,$cnic, $course,$c_duration,$a_month, $total_fee,$installment_no,$first_installment_no,$advance,$remaning_amount)){
+                    if($db->insertStudents($c_id,$a_id, $name, $f_name, $st_gender, $contact_no, $address, $reference,$cnic, $course,$c_duration,$a_month,$ad_date, $total_fee,$installment_no,$first_installment_no,$advance,$remaning_amount)){
                         $db = new DbOperation();
                         $id=$db->getLastStudent();
                         $result = $db->insertFirstInstallment($id,$c_id,$a_id, $advance,$remaning_amount, $first_installment_no,$a_month);
-
+                        
         $netbalance = $db->getnetbalanceMainAcct($a_id,$c_id);
         $totalnetbalance =0;
         $totalnetbalance = $netbalance + $advance;
