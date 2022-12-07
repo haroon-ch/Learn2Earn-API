@@ -40,10 +40,10 @@ class DbOperation
             function getStudents($c_id)
             {
                 if($c_id == 3){
-                    $stmt = $this->con->prepare ("SELECT `id`,`c_id`, `name`, `f_name`, `st_gender`, `contact_no`, `address`, `reference`, `cnic`, `course`,`c_duration`, `ad_date`, `total_fee`,`installment_no`,`advance`,`remaning_amount`, `status`, `st_status` FROM `a_student`");
+                    $stmt = $this->con->prepare ("SELECT `c_id`, `a_id`, `name`, `f_name`, `st_gender`, `contact_no`, `address`, `reference`, `cnic`, `course`, `c_duration`, `a_month`, `upcoming_installment`, `ad_date`, `total_fee`, `installment_no`, `per_installment`, `first_installment_no`, `advance`, `remaning_amount`, `status`, `st_status` FROM `a_student`");
                     // $stmt->bind_param("i", $c_id);
                     $stmt->execute();
-                    $stmt->bind_result($id,$c_id, $name,$f_name, $st_gender,$contact_no, $address,$reference, $cnic,$course,$c_duration, $ad_date,$total_fee, $installment_no,$advance,$remaning_amount,$status,$st_status);
+                    $stmt->bind_result($id,$c_id, $name,$f_name, $st_gender,$contact_no, $address,$reference, $cnic,$course,$c_duration,$a_month,$upcoming_installment, $ad_date,$total_fee, $installment_no,$per_installment,$first_installment_no,$advance,$remaning_amount,$status,$st_status);
                     // $stmt->fetch();
                     $cat = array();
                             while ($stmt->fetch()) {
@@ -59,9 +59,13 @@ class DbOperation
                     $test['cnic'] = $cnic;
                     $test['course'] = $course;
                     $test['c_duration'] = $c_duration;
+                    $test['a_month'] = $a_month;
+                    $test['upcoming_installment'] = $upcoming_installment;
                     $test['ad_date'] = $ad_date;
                     $test['total_fee'] = $total_fee;
                     $test['installment_no'] = $installment_no;
+                    $test['per_installment'] = $per_installment;
+                    $test['first_installment_no'] = $first_installment_no;
                     $test['advance'] = $advance;
                     $test['remaning_amount'] = $remaning_amount;
                     $test['status'] = $status;
@@ -71,10 +75,10 @@ class DbOperation
                     return $cat;
                 }
                 else{
-                    $stmt = $this->con->prepare ("SELECT `id`,`c_id`, `name`, `f_name`, `st_gender`, `contact_no`, `address`, `reference`, `cnic`, `course`,`c_duration`, `ad_date`, `total_fee`,`installment_no`,`advance`,`remaning_amount`, `status`, `st_status` FROM `a_student` WHERE c_id =?");
+                    $stmt = $this->con->prepare ("SELECT `c_id`, `a_id`, `name`, `f_name`, `st_gender`, `contact_no`, `address`, `reference`, `cnic`, `course`, `c_duration`, `a_month`, `upcoming_installment`, `ad_date`, `total_fee`, `installment_no`, `per_installment`, `first_installment_no`, `advance`, `remaning_amount`, `status`, `st_status` FROM a_student WHERE c_id=?");
                     $stmt->bind_param("i", $c_id);
                     $stmt->execute();
-                    $stmt->bind_result($id,$c_id, $name,$f_name, $st_gender,$contact_no, $address,$reference, $cnic,$course,$c_duration, $ad_date,$total_fee, $installment_no,$advance,$remaning_amount,$status,$st_status);
+                    $stmt->bind_result($id,$c_id, $name,$f_name, $st_gender,$contact_no, $address,$reference, $cnic,$course,$c_duration,$a_month,$upcoming_installment, $ad_date,$total_fee, $installment_no,$per_installment,$first_installment_no,$advance,$remaning_amount,$status,$st_status);
                     // $stmt->fetch();
                     $cat = array();
                             while ($stmt->fetch()) {
@@ -90,9 +94,13 @@ class DbOperation
                     $test['cnic'] = $cnic;
                     $test['course'] = $course;
                     $test['c_duration'] = $c_duration;
+                    $test['a_month'] = $a_month;
+                    $test['upcoming_installment'] = $upcoming_installment;
                     $test['ad_date'] = $ad_date;
                     $test['total_fee'] = $total_fee;
                     $test['installment_no'] = $installment_no;
+                    $test['per_installment'] = $per_installment;
+                    $test['first_installment_no'] = $first_installment_no;
                     $test['advance'] = $advance;
                     $test['remaning_amount'] = $remaning_amount;
                     $test['status'] = $status;
@@ -116,12 +124,12 @@ class DbOperation
             }
 
             // student first insertInstallments addmission time 
-            function insertFirstInstallment($id,$c_id,$i_amount,$remaning_payment,$installmentNo,$month)
+            function insertFirstInstallment($id,$c_id,$a_id,$i_amount,$remaning_payment,$installmentNo,$month,$upcoming_installment)
             {       
             date_default_timezone_set("Asia/Karachi");
             $date = date("ymd");
-            $stmt=$this->con->prepare("INSERT INTO `installments` (`id`,`c_id`, `i_amount`,`remaning_payment`, `date`, `installmentNo`,`month`) VALUES (?,?,?,?,?,?,?)");
-            $stmt->bind_param("iiiisis", $id,$c_id,$i_amount,$remaning_payment, $date,$installmentNo,$month);
+            $stmt=$this->con->prepare("INSERT INTO `installments` (`id`,`c_id`,`a_id`, `i_amount`,`remaning_payment`, `date`, `installmentNo`,`month`,`upcoming_installment`) VALUES (?,?,?,?,?,?,?,?,?)");
+            $stmt->bind_param("iiiiisiss", $id,$c_id,$a_id,$i_amount,$remaning_payment, $date,$installmentNo,$month,$upcoming_installment);
             if ($stmt->execute())
                 {
                     return PROFILE_CREATED;
@@ -130,38 +138,50 @@ class DbOperation
             } 
 
                 //  Students admission 
-            function insertStudents($c_id,$a_id,$name,$f_name, $st_gender, $contact_no,$address, $reference,$cnic, $course,$c_duration,$a_month, $total_fee,$installment_no,$first_installment_no, $advance,$remaning_amount)
+            function insertStudents($c_id,$a_id,$name,$f_name, $st_gender, $contact_no,$address, $reference,$cnic, $course,$c_duration,$a_month,$upcoming_installment,$ad_date, $total_fee,$installment_no,$per_installment,$first_installment_no, $advance,$remaning_amount)
             {       
-                date_default_timezone_set("Asia/Karachi");
-                $ad_date = date("ymd");
+                // date_default_timezone_set("Asia/Karachi");
+                // $ad_date = date("ymd");
                 $status="pending";
                 $st_status="active";
-                // $first_installment_no=0;
                 $amount=0;
-                $stmt=$this->con->prepare("INSERT INTO `a_student`(`c_id`, `a_id`, `name`, `f_name`, `st_gender`, `contact_no`, `address`, `reference`, `cnic`, `course`, `c_duration`, `a_month`, `ad_date`, `total_fee`, `installment_no`, `first_installment_no`, `advance`, `remaning_amount`, `status`, `st_status`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-                $stmt->bind_param("iisssssssssssiiiiiss",$c_id,$a_id, $name,$f_name, $st_gender, $contact_no,$address, $reference,$cnic, $course,$c_duration,$a_month,$ad_date,$total_fee,$installment_no,$first_installment_no, $advance,$remaning_amount,$status,$st_status);
+                $stmt=$this->con->prepare("INSERT INTO `a_student`(`c_id`, `a_id`, `name`, `f_name`, `st_gender`, `contact_no`, `address`, `reference`, `cnic`, `course`, `c_duration`, `a_month`,`upcoming_installment`, `ad_date`, `total_fee`, `installment_no`,`per_installment`, `first_installment_no`, `advance`, `remaning_amount`, `status`, `st_status`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+                $stmt->bind_param("iissssssssssssiiiiiiss",$c_id,$a_id, $name,$f_name, $st_gender, $contact_no,$address, $reference,$cnic, $course,$c_duration,$a_month,$upcoming_installment,$ad_date,$total_fee,$installment_no,$per_installment,$first_installment_no, $advance,$remaning_amount,$status,$st_status);
                 if ($stmt->execute())
                 {
                     $stmt = $this->con->prepare("SELECT netbalance FROM main_account where a_id = (select MAX(a_id) from main_account)");
                     $stmt->execute();
                     $stmt->bind_result($netbalance);
                     $stmt->fetch();
-                    return $netbalance;
+                    return PROFILE_CREATED;
                 }
-                return PROFILE_NOT_CREATED;
+                else{
+                    return PROFILE_NOT_CREATED;
+                }
+                
             }  
 
             //       update Students 
-            function updateStudents($id,$c_id,$name,$f_name,$st_gender, $contact_no,$address, $reference,	$cnic, $course,$c_duration,$ad_date, $total_fee,$installment_no, $advance,$remaning_amount, $status,$st_status)
+                 function updateStudents($id,$c_id,$name,$f_name, $st_gender, $contact_no,$address, $reference,$cnic, $course,$c_duration,$a_month,$upcoming_installment,$ad_date, $total_fee,$installment_no,$per_installment,$first_installment_no, $advance,$remaning_amount,$status,$st_status)
             {
-                $stmt=$this->con->prepare("UPDATE `a_student` SET `name`=?,`f_name`=?,`st_gender`=?,`contact_no`=?,`address`=?,`reference`=?,`cnic`=?,`course`=?,`c_duration`=?,`ad_date`=?,`total_fee`=?,`installment_no`=?,`advance`=?,`remaning_amount`=?,`status`=?,`st_status`=? WHERE id=? AND c_id=?");
-                $stmt->bind_param("ssssssssssiiiissii",$name,$f_name,$st_gender,$contact_no,$address,$reference,$cnic,$course,$c_duration,$ad_date,$total_fee, $installment_no, $advance,$remaning_amount,$status,$st_status,$id,$c_id);
+                $stmt=$this->con->prepare("UPDATE `a_student` SET `name`=?,`f_name`=?,`st_gender`=?,`contact_no`=?,`address`=?,`reference`=?,`cnic`=?,`course`=?,`c_duration`=?,`a_month`=?,`upcoming_installment`=?,`ad_date`=?,`total_fee`=?,`installment_no`=?,`per_installment`=?,`first_installment_no`=?,`advance`=?,`remaning_amount`=?,`status`=?,`st_status`=? WHERE id = ? AND c_id=?");
+                $stmt->bind_param("ssssssssssssiiiiiissii",$name,$f_name, $st_gender, $contact_no,$address, $reference,$cnic, $course,$c_duration,$a_month,$upcoming_installment,$ad_date, $total_fee,$installment_no,$per_installment,$first_installment_no, $advance,$remaning_amount,$status,$st_status,$id,$c_id);
                 if($stmt->execute())
                 {
                     return PROFILE_CREATED;
                 }
                 return PROFILE_NOT_CREATED;
             }
+            // function updateStudents($id,$c_id,$a_id,$name,$f_name,$st_gender, $contact_no,$address, $reference,	$cnic, $course,$c_duration,$a_month,$upcoming_installment,$ad_date, $total_fee,$installment_no,$per_installment,$first_installment_no, $advance,$remaning_amount, $status,$st_status)
+            // {
+            //     $stmt=$this->con->prepare("UPDATE `a_student` SET `id`=?,`c_id`=?,`a_id`=?,`name`=?,`f_name`=?,`st_gender`=?,`contact_no`=?,`address`=?,`reference`=?,`cnic`=?,`course`=?,`c_duration`=?,`a_month`=?,`upcoming_installment`=?,`ad_date`=?,`total_fee`=?,`installment_no`=?,`per_installment`=?,`first_installment_no`=?,`advance`=?,`remaning_amount`=?,`status`=?,`st_status`=? WHERE id = ? AND c_id=?");
+            //     $stmt->bind_param("ssssssssssssiiiiiissiii",$name,$f_name,$st_gender,$contact_no,$address,$reference,$cnic,$course,$c_duration,$a_month,$upcoming_installment,$ad_date,$total_fee, $installment_no,$per_installment,$first_installment_no, $advance,$remaning_amount,$status,$st_status,$id,$c_id,$a_id);
+            //     if($stmt->execute())
+            //     {
+            //         return PROFILE_CREATED;
+            //     }
+            //     return PROFILE_NOT_CREATED;
+            // }
 
             // delete Students one by one with c_id and student id
             function deleteStudents($id,$c_id)
@@ -329,10 +349,10 @@ class DbOperation
             }
 
                //   insertInstallments method
-            function insertInstallments($id,$a_id,$c_id,$i_amount,$remaning_payment,$date,$installmentNo,$month)
+            function insertInstallments($id,$a_id,$c_id,$i_amount,$remaning_payment,$date,$installmentNo,$month,$upcoming_installment)
             {       
-            $stmt=$this->con->prepare("INSERT INTO `installments` (`id`,`a_id`,`c_id`, `i_amount`,`remaning_payment`, `date`, `installmentNo`,`month`) VALUES (?,?,?,?,?,?,?,?)");
-            $stmt->bind_param("iiiiisis", $id,$a_id,$c_id,$i_amount,$remaning_payment, $date,$installmentNo,$month);
+            $stmt=$this->con->prepare("INSERT INTO `installments` (`id`,`a_id`,`c_id`, `i_amount`,`remaning_payment`, `date`, `installmentNo`,`month`,`upcoming_installment`) VALUES (?,?,?,?,?,?,?,?,?)");
+            $stmt->bind_param("iiiiisiss", $id,$a_id,$c_id,$i_amount,$remaning_payment, $date,$installmentNo,$month,$upcoming_installment);
             if ($stmt->execute())
                 {
                     // return PROFILE_CREATED;
@@ -530,11 +550,18 @@ class DbOperation
             function get_Installmentsbymonth($month,$c_id)
             {
                 if($c_id == 3){
-                    $stmt = $this->con->prepare ("SELECT `id`,`c_id`,`name`,`f_name`,`st_gender`,`contact_no`,`address`,`reference`,`cnic`,`course`,`c_duration`,`ad_date`,`total_fee`,`installment_no`,`advance`,`status`,`st_status` FROM a_student WHERE id IN (SELECT installments.id FROM installments WHERE month != ? )");
+                    $stmt = $this->con->prepare ("SELECT a_student.`id`,a_student.`c_id`,a_student.`name`,a_student.`f_name`,a_student.`st_gender`,
+                    a_student.`contact_no`,a_student.`address`,a_student.`reference`,a_student.`cnic`,a_student.`course`,
+                    a_student.`c_duration`,a_student.`ad_date`,a_student.`total_fee`,a_student.`installment_no`,a_student.per_installment,a_student.`advance`,
+                    a_student.`status`,a_student.`st_status`,installments.i_amount,installments.remaning_payment,installments.date,installments.installmentNo,
+                    installments.month,installments.upcoming_installment FROM a_student JOIN installments ON a_student.id = installments.id
+                     WHERE a_student.id IN (SELECT installments.id FROM installments WHERE month != ? )");
                     $stmt->bind_param("s",$month);
                    $stmt->execute();    
                    $stmt->bind_result( $id,$c_id,$name,$f_name,$st_gender,$contact_no,$address,$reference,
-                                       $cnic,$course,$c_duration,$ad_date, $total_fee,$installment_no,$advance,$status,$st_status);
+                                       $cnic,$course,$c_duration,$ad_date, $total_fee,$installment_no,$per_installment,$advance,$status,$st_status,
+                                       $i_amount,$remaning_payment
+                                    ,$date,$installmentNo,$month,$upcoming_installment);
                    // $stmt->fetch();
                      $cat = array();
                             while ($stmt->fetch()) {
@@ -553,9 +580,15 @@ class DbOperation
                    $test['ad_date'] = $ad_date;
                    $test['total_fee'] = $total_fee;
                    $test['installment_no'] = $installment_no;
+                   $test['per_installment'] = $per_installment;
                    $test['advance'] = $advance;
                    $test['status'] = $status;
-                   $test['st_status'] = $st_status;
+                   $test['i_amount'] = $i_amount;
+                   $test['remaning_payment'] = $remaning_payment;
+                   $test['date'] = $date;
+                   $test['installmentNo'] = $installmentNo;
+                   $test['month'] = $month;
+                   $test['upcoming_installment'] = $upcoming_installment;
                   
                     array_push($cat, $test);
                    }
@@ -563,11 +596,17 @@ class DbOperation
                 }
                 else
                 {
-                    $stmt = $this->con->prepare ("SELECT `id`,`c_id`,`name`,`f_name`,`st_gender`,`contact_no`,`address`,`reference`,`cnic`,`course`,`c_duration`,`ad_date`,`total_fee`,`installment_no`,`advance`,`status`,`st_status` FROM a_student WHERE id IN (SELECT installments.id FROM installments WHERE month != ? ) AND c_id=?");
+                    $stmt = $this->con->prepare ("SELECT a_student.`id`,a_student.`c_id`,a_student.`name`,a_student.`f_name`,a_student.`st_gender`,
+                    a_student.`contact_no`,a_student.`address`,a_student.`reference`,a_student.`cnic`,a_student.`course`,
+                    a_student.`c_duration`,a_student.`ad_date`,a_student.`total_fee`,a_student.`installment_no`,a_student.per_installment,a_student.`advance`,
+                    a_student.`status`,a_student.`st_status`,installments.i_amount,installments.remaning_payment,installments.date,installments.installmentNo,
+                    installments.month,installments.upcoming_installment FROM a_student JOIN installments ON a_student.id = installments.id WHERE a_student.id IN (SELECT installments.id FROM installments WHERE month != ? ) AND installments.c_id=?");
                     $stmt->bind_param("si",$month,$c_id);
                    $stmt->execute();
                    $stmt->bind_result( $id,$c_id,$name,$f_name,$st_gender,$contact_no,$address,$reference,
-                                       $cnic,$course,$c_duration,$ad_date, $total_fee,$installment_no,$advance,$status,$st_status);
+                                       $cnic,$course,$c_duration,$ad_date, $total_fee,$installment_no,$per_installment,$advance,$status,$st_status,
+                                       $i_amount,$remaning_payment
+                                       ,$date,$installmentNo,$month,$upcoming_installment);
                    // $stmt->fetch();
                      $cat = array();
                             while ($stmt->fetch()) {
@@ -586,10 +625,16 @@ class DbOperation
                    $test['ad_date'] = $ad_date;
                    $test['total_fee'] = $total_fee;
                    $test['installment_no'] = $installment_no;
+                   $test['per_installment'] = $per_installment;
                    $test['advance'] = $advance;
                    $test['status'] = $status;
                    $test['st_status'] = $st_status;
-                  
+                   $test['i_amount'] = $i_amount;
+                   $test['remaning_payment'] = $remaning_payment;
+                   $test['date'] = $date;
+                   $test['installmentNo'] = $installmentNo;
+                   $test['month'] = $month;
+                   $test['upcoming_installment'] = $upcoming_installment;
                     array_push($cat, $test);
                    }
                    return $cat;
@@ -866,12 +911,11 @@ class DbOperation
                 else{
                     if($ide == 1)
                     {     
-                          $stmt = $this->con->prepare ("SELECT DAYNAME(transactions.t_date) as day, transactions.t_id,transactions.a_id,transactions.c_id,transactions.from,transactions.to,
-                          transactions.debit,transactions.credit,transactions.netbalance, transactions.type,transactions.description,transactions.t_date FROM transactions WHERE c_id=? AND  t_date >= NOW() + INTERVAL -7 DAY  AND t_date < NOW() + INTERVAL 0 DAY GROUP BY day(t_date) ORDER BY day(t_date)");
+                          $stmt = $this->con->prepare ("SELECT DAYNAME(transactions.t_date) as day, transactions.t_id,transactions.a_id,transactions.c_id,transactions.from,transactions.to, transactions.debit,transactions.credit,transactions.netbalance,
+                           transactions.type,transactions.description,transactions.t_date,main_account.name FROM transactions JOIN main_account ON transactions.a_id = main_account.a_id WHERE transactions.c_id=? AND t_date >= NOW() + INTERVAL -7 DAY AND t_date < NOW() + INTERVAL 0 DAY GROUP BY day(t_date) ORDER BY day(t_date)");
                           $stmt->bind_param("i", $c_id);
                           $stmt->execute();
-                          $stmt->bind_result($day,$t_id,$a_id,$c_id,$from,$to,$debit,$credit,$netbalance,$type,$description,$t_date);
-                
+                          $stmt->bind_result($day,$t_id,$a_id,$c_id,$from,$to,$debit,$credit,$netbalance,$type,$description,$t_date,$name);
                   $cat = array();
                          while ($stmt->fetch()) {
                              $test = array();
@@ -888,6 +932,7 @@ class DbOperation
                              $test['type'] = $type;
                              $test['description'] = $description;
                              $test['t_date'] = $t_date;
+                             $test['name'] = $name;
                            array_push($cat, $test);
                           }
                           return $cat;
@@ -895,10 +940,11 @@ class DbOperation
                 
                     if ($ide == 2)
                     {                                //   Total transactions details by last 7 Month
-                           $stmt = $this->con->prepare ("SELECT date_format(t_date,'%M') as month,date_format(t_date,'%Y') as year, transactions.t_id,transactions.a_id,transactions.c_id,transactions.from,transactions.to, transactions.debit,transactions.credit,transactions.netbalance, transactions.type,transactions.description,transactions.t_date FROM transactions WHERE c_id=? AND t_date >= NOW()-INTERVAL 7 month GROUP BY year(t_date),month(t_date) ORDER BY year(t_date),month(t_date)");
+                           $stmt = $this->con->prepare ("                        
+                           SELECT date_format(t_date,'%M') as month,date_format(t_date,'%Y') as year, transactions.t_id,transactions.a_id,transactions.c_id,transactions.from,transactions.to, transactions.debit,transactions.credit,transactions.netbalance, transactions.type,transactions.description,transactions.t_date,main_account.name FROM transactions JOIN main_account ON transactions.a_id = main_account.a_id WHERE transactions.c_id=? AND t_date >= NOW()-INTERVAL 7 month GROUP BY year(t_date),month(t_date) ORDER BY year(t_date),month(t_date)");
                            $stmt->bind_param("i",$c_id);
                            $stmt->execute();
-                           $stmt->bind_result($month, $year ,$t_id,$a_id,$c_id,$from,$to,$debit,$credit,$netbalance,$type,$description,$t_date);
+                           $stmt->bind_result($month, $year ,$t_id,$a_id,$c_id,$from,$to,$debit,$credit,$netbalance,$type,$description,$t_date,$name);
                 
                              $cat = array();
                                     while ($stmt->fetch()) {
@@ -918,6 +964,7 @@ class DbOperation
                                         $test['type'] = $type;
                                         $test['description'] = $description;
                                         $test['t_date'] = $t_date;
+                                        $test['name'] = $name;
                 
                             array_push($cat, $test);
                            }
@@ -1005,13 +1052,15 @@ class DbOperation
             {
                 if($c_id ==3){
                     $cat3 = array();    
-                    $stmt = $this->con->prepare("SELECT  a_student.id, a_student.c_id,a_student.name,a_student.f_name,a_student.st_gender,
-                    a_student.contact_no,a_student.address,a_student.reference,a_student.cnic,a_student.course,a_student.c_duration,
-                    a_student.ad_date, a_student.total_fee,a_student.installment_no,a_student.advance,a_student.status,a_student.st_status FROM a_student WHERE course = ?");
+                    $stmt = $this->con->prepare("SELECT `id`, `c_id`, `name`, `f_name`, `st_gender`, `contact_no`, `address`, `reference`, `cnic`,
+                     `course`, `c_duration`, `a_month`, `upcoming_installment`, `ad_date`, `total_fee`, `installment_no`,
+                      `per_installment`, `first_installment_no`, `advance`, `remaning_amount`, `status`, `st_status`
+                       FROM `a_student` WHERE course = ?");
                     $stmt->bind_param("s", $course);
                     $stmt->execute();
-                    $stmt->bind_result($id,$c_id,$name, $f_name, $st_gender, $contact_no, $address,$reference, $cnic, $course, $c_duration,
-                     $ad_date,$total_fee, $installment_no, $advance, $status, $st_status);
+                    $stmt->bind_result($id,$c_id,$name, $f_name, $st_gender, $contact_no, $address,$reference,
+                     $cnic, $course, $c_duration,$a_month,$upcoming_installment,
+                     $ad_date,$total_fee, $installment_no,$per_installment,$first_installment_no, $advance,$remaning_amount, $status, $st_status);
                 $cat2 = array();
                 while ($stmt->fetch()) {
                 $data = array();
@@ -1026,10 +1075,15 @@ class DbOperation
                 $data['cnic'] = $cnic;
                 $data['course'] = $course;
                 $data['c_duration'] = $c_duration;
+                $data['a_month'] = $a_month;
+                $data['upcoming_installment'] = $upcoming_installment;
                 $data['ad_date'] = $ad_date;
                 $data['total_fee'] = $total_fee;
                 $data['installment_no'] = $installment_no;
+                $data['per_installment'] = $per_installment;
+                $data['first_installment_no'] = $first_installment_no;
                 $data['advance'] = $advance;
+                $data['remaning_amount'] = $remaning_amount;
                 $data['status'] = $status;
                 $data['st_status'] = $st_status;
                 array_push($cat2, $data);
@@ -1039,13 +1093,15 @@ class DbOperation
                 }
                 else{
                     $cat3 = array();    
-                    $stmt = $this->con->prepare("SELECT  a_student.id, a_student.c_id,a_student.name,a_student.f_name,a_student.st_gender,
-                    a_student.contact_no,a_student.address,a_student.reference,a_student.cnic,a_student.course,a_student.c_duration,
-                    a_student.ad_date, a_student.total_fee,a_student.installment_no,a_student.advance,a_student.status,a_student.st_status FROM a_student WHERE course = ? AND c_id=?");
+                    $stmt = $this->con->prepare("SELECT `id`, `c_id`, `name`, `f_name`, `st_gender`, `contact_no`, `address`, `reference`, `cnic`,
+                    `course`, `c_duration`, `a_month`, `upcoming_installment`, `ad_date`, `total_fee`, `installment_no`,
+                     `per_installment`, `first_installment_no`, `advance`, `remaning_amount`, `status`, `st_status`
+                      FROM `a_student` WHERE course = ? AND c_id = ?");
                     $stmt->bind_param("si", $course,$c_id);
                     $stmt->execute();
-                    $stmt->bind_result($id,$c_id,$name, $f_name, $st_gender, $contact_no, $address,$reference, $cnic, $course, $c_duration,
-                     $ad_date,$total_fee, $installment_no, $advance, $status, $st_status);
+                    $stmt->bind_result($id,$c_id,$name, $f_name, $st_gender, $contact_no, $address,$reference,
+                    $cnic, $course, $c_duration,$a_month,$upcoming_installment,
+                    $ad_date,$total_fee, $installment_no,$per_installment,$first_installment_no, $advance,$remaning_amount, $status, $st_status);
                 $cat2 = array();
                 while ($stmt->fetch()) {
                 $data = array();
@@ -1060,10 +1116,15 @@ class DbOperation
                 $data['cnic'] = $cnic;
                 $data['course'] = $course;
                 $data['c_duration'] = $c_duration;
+                $data['a_month'] = $a_month;
+                $data['upcoming_installment'] = $upcoming_installment;
                 $data['ad_date'] = $ad_date;
                 $data['total_fee'] = $total_fee;
                 $data['installment_no'] = $installment_no;
+                $data['per_installment'] = $per_installment;
+                $data['first_installment_no'] = $first_installment_no;
                 $data['advance'] = $advance;
+                $data['remaning_amount'] = $remaning_amount;
                 $data['status'] = $status;
                 $data['st_status'] = $st_status;
                 array_push($cat2, $data);
@@ -1150,15 +1211,15 @@ class DbOperation
                     $stmt->bind_param("i", $a_id);
                     $stmt->execute();
                     $stmt->bind_result($netbalance,$c_id);
-                    // $stmt->fetch();
+                    $stmt->fetch();
                     return $netbalance;
                 }
                 else{
-                    $stmt = $this->con->prepare("SELECT netbalance,c_id FROM main_account where `a_id`=? AND c_id=?");
+                    $stmt = $this->con->prepare("SELECT `netbalance` FROM `main_account` WHERE a_id = ? AND c_id =?");
                     $stmt->bind_param("ii", $a_id,$c_id);
                     $stmt->execute();
-                    $stmt->bind_result($netbalance,$c_id);
-                    // $stmt->fetch();
+                    $stmt->bind_result($netbalance);
+                    $stmt->fetch();
                     return $netbalance;
                 }
             }
@@ -1198,12 +1259,12 @@ class DbOperation
                 }
             }
                     // Insert Transactions
-            function transactions($a_id,$c_id, $from, $to, $debit, $credit,$netbalance, $type, $description)
+            function transactions($a_id,$c_id, $from, $to, $debit, $credit,$netbalance, $type, $description,$other)
             {
                 date_default_timezone_set("Asia/Karachi");
                 $t_date = date("ymd");
-                $stmt = $this->con->prepare("INSERT INTO `transactions`(`a_id`,`c_id`, `from`, `to`, `debit`, `credit`, `netbalance`, `type`, `description`, `t_date`) VALUES (?,?,?,?,?,?,?,?,?,?)");
-                $stmt->bind_param("iiiiiiisss", $a_id,$c_id, $from, $to, $debit, $credit , $netbalance, $type, $description,$t_date);
+                $stmt = $this->con->prepare("INSERT INTO `transactions`(`a_id`, `c_id`, `from`, `to`, `debit`, `credit`, `netbalance`, `type`, `description`, `t_date`, `other`) VALUES (?,?,?,?,?,?,?,?,?,?,?)");
+                $stmt->bind_param("iiiiiiissss", $a_id,$c_id, $from, $to, $debit, $credit , $netbalance, $type, $description,$t_date,$other);
                 if ($stmt->execute()) {
             
                     return PROFILE_CREATED;

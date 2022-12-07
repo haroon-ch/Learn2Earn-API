@@ -63,18 +63,20 @@ $app = new \Slim\App([
             $course=$requestData->course;
             $c_duration=$requestData->c_duration;
             $a_month=$requestData->a_month;
+            $upcoming_installment=$requestData->upcoming_installment;
             $ad_date=$requestData->ad_date;
             $total_fee=$requestData->total_fee;
             $installment_no=$requestData->installment_no;
+            $per_installment=$requestData->per_installment;
             $first_installment_no=$requestData->first_installment_no;
             $advance=$requestData->advance;
             $remaning_amount=$requestData->remaning_amount;
                 $db = new DbOperation();
                 $responseData = array();
-                    if($db->insertStudents($c_id,$a_id, $name, $f_name, $st_gender, $contact_no, $address, $reference,$cnic, $course,$c_duration,$a_month,$ad_date, $total_fee,$installment_no,$first_installment_no,$advance,$remaning_amount)){
+                    if($db->insertStudents($c_id,$a_id, $name, $f_name, $st_gender, $contact_no, $address, $reference,$cnic, $course,$c_duration,$a_month,$upcoming_installment,$ad_date, $total_fee,$installment_no,$per_installment,$first_installment_no,$advance,$remaning_amount)){
                         $db = new DbOperation();
                         $id=$db->getLastStudent();
-                        $result = $db->insertFirstInstallment($id,$c_id,$a_id, $advance,$remaning_amount, $first_installment_no,$a_month);
+                        $result = $db->insertFirstInstallment($id,$c_id,$a_id, $advance,$remaning_amount, $first_installment_no,$a_month,$upcoming_installment);
                         
         $netbalance = $db->getnetbalanceMainAcct($a_id,$c_id);
         $totalnetbalance =0;
@@ -82,7 +84,8 @@ $app = new \Slim\App([
         $amount = 0;
         $type = "Addmission";
         $description = "Student Addmission";
-        $test = $db->transactions($a_id, $c_id, $a_id, $a_id, $amount, $advance , $totalnetbalance, $type, $description);
+        $other = "empty";
+        $test = $db->transactions($a_id, $c_id, $a_id, $a_id, $amount, $advance , $totalnetbalance, $type, $description, $other);
         $result1 = $db->updateMainAcct($a_id,$c_id, $totalnetbalance);
         $responseData=array();
                     $responseData['data'] = $result1;
@@ -103,6 +106,7 @@ $app = new \Slim\App([
             $requestData = json_decode($request->getBody());
                 $id=$requestData->id;
                 $c_id=$requestData->c_id;
+                // $a_id=$requestData->a_id;
                 $name=$requestData->name;
                 $f_name=$requestData->f_name;
                 $st_gender=$requestData->st_gender;
@@ -112,16 +116,20 @@ $app = new \Slim\App([
                 $cnic=$requestData->cnic;
                 $course=$requestData->course;
                 $c_duration=$requestData->c_duration;
+                $a_month=$requestData->a_month;
+                $upcoming_installment=$requestData->upcoming_installment;
                 $ad_date=$requestData->ad_date;
                 $total_fee=$requestData->total_fee;
                 $installment_no=$requestData->installment_no;
+                $per_installment=$requestData->per_installment;
+                $first_installment_no=$requestData->first_installment_no;
                 $advance=$requestData->advance;
                 $remaning_amount=$requestData->remaning_amount;
                 $status=$requestData->status;
                 $st_status=$requestData->st_status;
                 $db = new DbOperation();
                 $responseData = array();
-                if ($db->updateStudents($id,$c_id,$name,$f_name,$st_gender,$contact_no,$address,$reference,$cnic,$course,$c_duration,$ad_date,$total_fee,$installment_no,$advance,$remaning_amount,$status,$st_status)){
+                if ($db->updateStudents($id,$c_id,$name,$f_name,$st_gender,$contact_no,$address,$reference,$cnic,$course,$c_duration,$a_month,$upcoming_installment,$ad_date,$total_fee,$installment_no,$per_installment,$first_installment_no,$advance,$remaning_amount,$status,$st_status)){
                 $responseData['error'] = false;
                 $responseData['message'] = 'updated sucessfully';
             } else {    
@@ -178,20 +186,23 @@ $app = new \Slim\App([
             $c_id=$requestData->c_id;
             $i_amount=$requestData->i_amount;
             $remaning_payment=$requestData->remaning_payment;
+            // $per_installment=$requestData->per_installment;
             $date=$requestData->date;
             $installmentNo=$requestData->installmentNo;
             $month=$requestData->month;
+            $upcoming_installment=$requestData->upcoming_installment;
             //   $status=$requestData->status;
                 $db = new DbOperation();
                 $responseData = array();
-                if ($db->insertInstallments($id,$a_id,$c_id, $i_amount,$remaning_payment,$date,$installmentNo,$month)){
+                if ($db->insertInstallments($id,$a_id,$c_id, $i_amount,$remaning_payment,$date,$installmentNo,$month,$upcoming_installment)){
         $netbalance = $db->getnetbalanceMainAcct($a_id,$c_id);
         $totalnetbalance =0;
         $totalnetbalance = $netbalance + $i_amount;
         $amount = 0;
         $type = "Installment";
         $description = "Student Installment";
-        $test = $db->transactions($a_id, $c_id, $a_id, $a_id, $amount, $i_amount , $totalnetbalance, $type, $description);
+        $other = "empty";
+        $test = $db->transactions($a_id, $c_id, $a_id, $a_id, $amount, $i_amount , $totalnetbalance, $type, $description,$other);
         $result1 = $db->updateMainAcct($a_id,$c_id, $totalnetbalance);
                 $responseData['error'] = false;
                 $responseData['message'] = 'data inserted sucessfully';
@@ -310,6 +321,7 @@ $app = new \Slim\App([
             //     $result=$db->get_InstallmentsbyStudentId($id);
             //     $response->getBody()->write(json_encode($result));
             // });
+
                 //get_InstallmentsbyStudentId done
             $app->post('/get_InstallmentsbyStudentId',function (Request $request,Response $response)
             {
