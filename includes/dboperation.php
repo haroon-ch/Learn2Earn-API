@@ -594,8 +594,11 @@ class DbOperation
                    }
                    return $cat;
                 }
+
                 else
+                
                 {
+
                     $stmt = $this->con->prepare ("SELECT a_student.`id`,a_student.`c_id`,a_student.`name`,a_student.`f_name`,a_student.`st_gender`,
                     a_student.`contact_no`,a_student.`address`,a_student.`reference`,a_student.`cnic`,a_student.`course`,
                     a_student.`c_duration`,a_student.`ad_date`,a_student.`total_fee`,a_student.`installment_no`,a_student.per_installment,a_student.`advance`,

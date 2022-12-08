@@ -352,6 +352,7 @@ $app = new \Slim\App([
                 $response->getBody()->write(json_encode($result));
             });
 
+            
              // getaccountbytype
             // $app->get('/getaccountsbytype/{type}' ,function (Request $request, Response $response)
             // {
