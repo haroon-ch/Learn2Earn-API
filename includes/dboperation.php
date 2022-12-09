@@ -1786,6 +1786,127 @@ class DbOperation
             //     }
             // }
 
+            // function gettransactionsbymainaccountByDate($a_id,$type, $c_id,$t_date)
+            // {
+            //     if($c_id == 3){
+            //         $cat3 = array();
+            //         $stmt = $this->con->prepare("SELECT transactions.t_id, transactions.a_id,transactions.c_id, transactions.debit, transactions.credit, transactions.netbalance, transactions.type, transactions.description, transactions.t_date, main_account.name FROM transactions JOIN main_account ON transactions.a_id = main_account.a_id WHERE transactions.t_date BETWEEN ? AND ? AND transactions.a_id = ? AND transactions.type =?");
+            //         $stmt->bind_param("iss", $a_id,$type,$t_date);
+            //         $stmt->execute();
+            //         $stmt->bind_result($t_id, $a_id,$c_id, $debit, $credit, $netbalance, $type, $description, $t_date, $name);
+            //     $cat = array();
+            //     while ($stmt->fetch()) {
+            //     $data = array();
+            //     $data['t_id'] = $t_id;
+            //     $data['a_id'] = $a_id;
+            //     $data['c_id'] = $c_id;
+            //     $data['debit'] = $debit;
+            //     $data['credit'] = $credit;
+            //     $data['netbalance'] = $netbalance;
+            //     $data['type'] = $type;
+            //     $data['description'] = $description;
+            //     $data['t_date'] = $t_date;
+            //     $data['name'] = $name;
+            //     array_push($cat, $data);
+            //     }
+            //     array_push($cat3, $cat);
+            //     $stmt = $this->con->prepare("SELECT SUM(debit) as total_debit FROM transactions WHERE transactions.t_date BETWEEN ? AND ? AND a_id = ? AND type = ?");
+            //     $stmt->bind_param("iss", $a_id,$type,$t_date);
+            //     $stmt->execute();
+            //     $stmt->bind_result($total_debit);
+            //     $cat2 = array();
+            //     while ($stmt->fetch()) {
+            //     $data = array();
+            //     $data['total_debit'] = $total_debit;
+            //     array_push($cat2, $data);
+            //     }
+            //     array_push($cat3, $cat2);
+            //     $stmt = $this->con->prepare("SELECT SUM(credit) as total_credit FROM transactions WHERE transactions.t_date BETWEEN ? AND ? AND a_id = ? AND type = ?");
+            //     $stmt->bind_param("iss", $a_id,$type,$t_date);
+            //     $stmt->execute();
+            //     $stmt->bind_result($total_credit);
+            //     $cat2 = array();
+            //     while ($stmt->fetch()) {
+            //     $data = array();
+            //     $data['total_credit'] = $total_credit;
+            //     array_push($cat2, $data);
+            //     }
+            //     array_push($cat3, $cat2);
+            //     $stmt = $this->con->prepare("SELECT netbalance FROM transactions where transactions.t_date BETWEEN ? AND ? AND t_id = (select MAX(t_id) from transactions WHERE a_id = ? AND type = ?)");
+            //     $stmt->bind_param("is", $a_id,$type);
+            //     $stmt->execute();
+            //     $stmt->bind_result($netbalance);
+            //     $cat2 = array();
+            //     while ($stmt->fetch()) {
+            //     $data = array();
+            //     $data['netbalance'] = $netbalance;
+            //     array_push($cat2, $data);
+            //     }
+            //     array_push($cat3, $cat2);
+    
+            //     return $cat3;
+            //     }
+
+            //     else{
+            //         $cat3 = array();
+            //         $stmt = $this->con->prepare("SELECT transactions.t_id, transactions.a_id,transactions.c_id, transactions.debit, transactions.credit, transactions.netbalance, transactions.type, transactions.description, transactions.t_date, main_account.name FROM transactions JOIN main_account ON transactions.a_id = main_account.a_id WHERE transactions.t_date BETWEEN ? AND ? AND transactions.a_id = ? AND transactions.type =? AND transactions.c_id=?");
+            //         $stmt->bind_param("isis", $a_id,$type,$c_id,$t_date);
+            //         $stmt->execute();
+            //         $stmt->bind_result($t_id, $a_id,$c_id, $debit, $credit, $netbalance, $type, $description, $t_date, $name);
+            //     $cat = array();
+            //     while ($stmt->fetch()) {
+            //     $data = array();
+            //     $data['t_id'] = $t_id;
+            //     $data['a_id'] = $a_id;
+            //     $data['c_id'] = $c_id;
+            //     $data['debit'] = $debit;
+            //     $data['credit'] = $credit;
+            //     $data['netbalance'] = $netbalance;
+            //     $data['type'] = $type;
+            //     $data['description'] = $description;
+            //     $data['t_date'] = $t_date;
+            //     $data['name'] = $name;
+            //     array_push($cat, $data);
+            //     }
+            //     array_push($cat3, $cat);
+            //     $stmt = $this->con->prepare("SELECT SUM(debit) as total_debit FROM transactions WHERE transactions.t_date BETWEEN ? AND ? AND a_id = ? AND type = ? AND c_id=?");
+            //     $stmt->bind_param("isis", $a_id,$type,$c_id,$t_date);
+            //     $stmt->execute();
+            //     $stmt->bind_result($total_debit);
+            //     $cat2 = array();
+            //     while ($stmt->fetch()) {
+            //     $data = array();
+            //     $data['total_debit'] = $total_debit;
+            //     array_push($cat2, $data);
+            //     }
+            //     array_push($cat3, $cat2);
+            //     $stmt = $this->con->prepare("SELECT SUM(credit) as total_credit FROM transactions WHERE transactions.t_date BETWEEN ? AND ? AND a_id = ? AND type = ? AND c_id=?");
+            //     $stmt->bind_param("isis", $a_id,$type,$c_id,$t_date);
+            //     $stmt->execute();
+            //     $stmt->bind_result($total_credit);
+            //     $cat2 = array();
+            //     while ($stmt->fetch()) {
+            //     $data = array();
+            //     $data['total_credit'] = $total_credit;
+            //     array_push($cat2, $data);
+            //     }
+            //     array_push($cat3, $cat2);
+            //     $stmt = $this->con->prepare(" SELECT netbalance FROM transactions where transactions.t_date BETWEEN ? AND ? AND t_id = (select MAX(t_id) from transactions WHERE a_id = ? AND type = ?) AND c_id=?");
+            //     $stmt->bind_param("isis", $a_id,$type,$c_id,$t_date);
+            //     $stmt->execute();
+            //     $stmt->bind_result($netbalance);
+            //     $cat2 = array();
+            //     while ($stmt->fetch()) {
+            //     $data = array();
+            //     $data['netbalance'] = $netbalance;
+            //     array_push($cat2, $data);
+            //     }
+            //     array_push($cat3, $cat2);
+    
+            //     return $cat3;
+            //     }
+            // }
+
 
 }   
 

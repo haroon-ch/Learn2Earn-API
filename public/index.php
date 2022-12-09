@@ -446,16 +446,16 @@ $app = new \Slim\App([
 
 
                 // Addaccount date method
-            // $app->post('/getAcountDate',function (Request $request,Response $response)
-            // {
-            //     $requestData = json_decode($request->getBody());
-            //     $to_date=$requestData->to_date;
-            //     $from_date=$requestData->from_date;
-            //     $c_id=$requestData->c_id;    
-            //         $db = new DbOperation();
-            //         $result = $db->getAcountDate($to_date,$from_date,$c_id);
-            //     $response->getBody()->write(json_encode($result));
-            // });
+            $app->post('/getAcountDate',function (Request $request,Response $response)
+            {
+                $requestData = json_decode($request->getBody());
+                $to_date=$requestData->to_date;
+                $from_date=$requestData->from_date;
+                $c_id=$requestData->c_id;    
+                    $db = new DbOperation();
+                    $result = $db->getAcountDate($to_date,$from_date,$c_id);
+                $response->getBody()->write(json_encode($result));
+            });
 
             // get account data by type
             // $app->post('/getaccountsbytype',function (Request $request,Response $response)
@@ -633,6 +633,19 @@ $app = new \Slim\App([
                 $result=$db->gettransactionsbyexpense($a_id, $type,$description,$c_id);
                 $response->getBody()->write(json_encode($result));
             });
+
+
+            // $app->post('/gettransactionsbymainaccountByDate',function (Request $request, Response $response)
+            // {
+            //     $requestData = json_decode($request->getBody());
+            //     $a_id=$requestData->a_id;
+            //     $c_id=$requestData->c_id;
+            //     $type=$requestData->type;
+            //     $t_date=$requestData->t_date;
+            //     $db = new DbOperation();
+            //     $result=$db->gettransactionsbymainaccountByDate($a_id,$type,$c_id,$t_date);
+            //     $response->getBody()->write(json_encode($result));
+            // });
 
 $app->run();
 ?>
