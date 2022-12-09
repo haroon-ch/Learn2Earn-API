@@ -556,6 +556,7 @@ $app = new \Slim\App([
                 $credit=$requestData->credit;
                 $type=$requestData->type;
                 $description=$requestData->description;
+                $other = "empty";
                 $db = new DbOperation();
                 $from_netbalance=$db->getnetbalanceMainAcct($from, $c_id);
                 // $c_id=$db->getnetbalanceMainAcct($c_id);
@@ -565,14 +566,14 @@ $app = new \Slim\App([
                 $netbalance2 = $to_netbalance;
                 $netbalance2 = $netbalance2 + $debit;
                 if($type == "expense") {
-                    $result1=$db->transactions($from,$c_id, $from, $to, $debit, $credit,$netbalance1, $type, $description);
+                    $result1=$db->transactions($from,$c_id, $from, $to, $debit, $credit,$netbalance1, $type, $description,$other);
                     $result1 = $db->updateMainAcct($from,$c_id, $netbalance1);
                 $response->getBody()->write(json_encode($result1));
                 }
                 if($type == "transaction"){
-                    $result1=$db->transactions($c_id,$from, $from, $to, $debit, $credit , $netbalance1, $type, $description);
+                    $result1=$db->transactions($c_id,$from, $from, $to, $debit, $credit , $netbalance1, $type, $description,$other);
                     $result1 = $db->updateMainAcct($from,$c_id, $netbalance1);
-                    $result1=$db->transactions($c_id,$to, $to, $from, $credit, $debit , $netbalance2, $type, $description);
+                    $result1=$db->transactions($c_id,$to, $to, $from, $credit, $debit , $netbalance2, $type, $description,$other);
                     $result1 = $db->updateMainAcct($to,$c_id, $netbalance2);
                     $response->getBody()->write(json_encode($result1));
                 }
