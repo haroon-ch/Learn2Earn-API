@@ -270,13 +270,15 @@ class DbOperation
             function getInstallments($c_id)
             {
             if($c_id == 3){
-                $stmt = $this->con->prepare ("SELECT a_student.id,a_student.c_id,a_student.name,a_student.f_name,a_student.st_gender,a_student.contact_no,a_student.address,
-                a_student.reference,a_student.cnic,a_student.course,a_student.c_duration, a_student.ad_date,a_student.total_fee,a_student.installment_no,a_student.first_installment_no,a_student.advance,
-                a_student.status,a_student.st_status,installments.i_id,installments.i_amount,installments.remaning_payment,installments.date,installments.installmentNo FROM a_student JOIN installments ON a_student.id = installments.id");
+                $stmt = $this->con->prepare ("SELECT a_student.id,a_student.c_id,a_student.name,a_student.f_name,a_student.st_gender,
+                a_student.contact_no,a_student.address, a_student.reference,a_student.cnic,a_student.course,a_student.c_duration
+                ,a_student.upcoming_installment, a_student.ad_date,a_student.total_fee,a_student.installment_no,a_student.per_installment,
+                 a_student.first_installment_no,a_student.advance, a_student.status,a_student.st_status,installments.i_id,installments.i_amount,
+                 installments.remaning_payment,installments.date,installments.installmentNo FROM a_student JOIN installments ON a_student.id = installments.id");
                 // $stmt->bind_param("i",$c_id);
                 $stmt->execute();
                 $stmt->bind_result($id,$c_id, $name,$f_name,$st_gender,$contact_no,$address,$reference,$cnic,$course,
-                $c_duration, $ad_date,$total_fee,$installment_no,$first_installment_no, $advance, $status,$st_status, $i_id,$i_amount,$remaning_payment, $date,$installmentNo);
+                $c_duration,$upcoming_installment, $ad_date,$total_fee,$installment_no,$per_installment,$first_installment_no, $advance, $status,$st_status, $i_id,$i_amount,$remaning_payment, $date,$installmentNo);
                 // $stmt->fetch();
                 $cat = array();
                         while ($stmt->fetch()) {
@@ -292,9 +294,11 @@ class DbOperation
                 $test['cnic'] = $cnic;
                 $test['course'] = $course;
                 $test['c_duration'] = $c_duration;
+                $test['upcoming_installment'] = $upcoming_installment;
                 $test['ad_date'] = $ad_date;
                 $test['total_fee'] = $total_fee;
                 $test['installment_no'] = $installment_no;
+                $test['per_installment'] = $per_installment;
                 $test['first_installment_no'] = $first_installment_no;
                 $test['advance'] = $advance;
                 $test['status'] = $status;
@@ -309,40 +313,44 @@ class DbOperation
                 return $cat;
             }
             else{
-                $stmt = $this->con->prepare ("SELECT a_student.id,a_student.c_id,a_student.name,a_student.f_name,a_student.st_gender,a_student.contact_no,a_student.address,
-                a_student.reference,a_student.cnic,a_student.course,a_student.c_duration, a_student.ad_date,a_student.total_fee,a_student.installment_no,a_student.first_installment_no,a_student.advance,
-                a_student.status,a_student.st_status,installments.i_id,installments.i_amount,installments.remaning_payment,installments.date,installments.installmentNo FROM a_student JOIN installments ON a_student.id = installments.id WHERE installments.c_id =(?)");
+                $stmt = $this->con->prepare ("SELECT a_student.id,a_student.c_id,a_student.name,a_student.f_name,a_student.st_gender,
+                a_student.contact_no,a_student.address, a_student.reference,a_student.cnic,a_student.course,a_student.c_duration,a_student.upcoming_installment,
+                 a_student.ad_date,a_student.total_fee,a_student.installment_no,a_student.per_installment, a_student.first_installment_no,a_student.advance,
+                  a_student.status,a_student.st_status,installments.i_id,installments.i_amount,installments.remaning_payment,installments.date,installments.installmentNo
+                   FROM a_student JOIN installments ON a_student.id = installments.id WHERE installments.c_id =?");
                 $stmt->bind_param("i",$c_id);
                 $stmt->execute();
                 $stmt->bind_result($id,$c_id, $name,$f_name,$st_gender,$contact_no,$address,$reference,$cnic,$course,
-                $c_duration, $ad_date,$total_fee,$installment_no,$first_installment_no, $advance, $status,$st_status, $i_id,$i_amount,$remaning_payment, $date,$installmentNo);
+                $c_duration,$upcoming_installment, $ad_date,$total_fee,$installment_no,$per_installment,$first_installment_no, $advance, $status,$st_status, $i_id,$i_amount,$remaning_payment, $date,$installmentNo);
                 // $stmt->fetch();
                 $cat = array();
                         while ($stmt->fetch()) {
                             $test = array();
-                $test['id'] = $id;
-                $test['c_id'] = $c_id;
-                $test['name'] = $name;
-                $test['f_name'] = $f_name;
-                $test['st_gender'] = $st_gender;
-                $test['contact_no'] = $contact_no;
-                $test['address'] = $address;
-                $test['reference'] = $reference;
-                $test['cnic'] = $cnic;
-                $test['course'] = $course;
-                $test['c_duration'] = $c_duration;
-                $test['ad_date'] = $ad_date;
-                $test['total_fee'] = $total_fee;
-                $test['installment_no'] = $installment_no;
-                $test['first_installment_no'] = $first_installment_no;
-                $test['advance'] = $advance;
-                $test['status'] = $status;
-                $test['st_status'] = $st_status;
-                $test['i_id'] = $i_id;
-                $test['i_amount'] = $i_amount;
-                $test['remaning_payment'] = $remaning_payment;
-                $test['date'] = $date;
-                $test['installmentNo'] = $installmentNo;
+                            $test['id'] = $id;
+                            $test['c_id'] = $c_id;
+                            $test['name'] = $name;
+                            $test['f_name'] = $f_name;
+                            $test['st_gender'] = $st_gender;
+                            $test['contact_no'] = $contact_no;
+                            $test['address'] = $address;
+                            $test['reference'] = $reference;
+                            $test['cnic'] = $cnic;
+                            $test['course'] = $course;
+                            $test['c_duration'] = $c_duration;
+                            $test['upcoming_installment'] = $upcoming_installment;
+                            $test['ad_date'] = $ad_date;
+                            $test['total_fee'] = $total_fee;
+                            $test['installment_no'] = $installment_no;
+                            $test['per_installment'] = $per_installment;
+                            $test['first_installment_no'] = $first_installment_no;
+                            $test['advance'] = $advance;
+                            $test['status'] = $status;
+                            $test['st_status'] = $st_status;
+                            $test['i_id'] = $i_id;
+                            $test['i_amount'] = $i_amount;
+                            $test['remaning_payment'] = $remaning_payment;
+                            $test['date'] = $date;
+                            $test['installmentNo'] = $installmentNo;
                 array_push($cat, $test);
                 }
                 return $cat;
