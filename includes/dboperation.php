@@ -201,7 +201,7 @@ class DbOperation
             function get_Student($c_id)
             {
                 if($c_id == 3){
-                    $stmt = $this->con->prepare ("SELECT  `id`,`c_id`, `name`, `f_name`, `st_gender`, `contact_no`, `address`, `reference`, `cnic`, `course`,`c_duration`, `ad_date`, `total_fee`, `installment_no`,`first_installment_no`,`advance`,`remaning_amount`, `status`, `st_status` FROM `a_student` WHERE `st_status`='active'");
+                    $stmt = $this->con->prepare ("SELECT  `id`,`c_id`, `name`, `f_name`, `st_gender`, `contact_no`, `address`, `reference`, `cnic`, `course`,`c_duration`, `ad_date`, `total_fee`, `installment_no`,`first_installment_no`,`advance`,`remaning_amount`, `status`, `st_status` FROM `a_student` WHERE `st_status`='active' AND `status`='pending'");
                     // $stmt->bind_param("i",$c_id);
                     $stmt->execute();
                     $stmt->bind_result($id,$c_id,$name,$f_name, $st_gender,$contact_no, $address,$reference, $cnic,$course,$c_duration, $ad_date,$total_fee,$installment_no,$first_installment_no,$advance,$remaning_amount, $status,$st_status);
@@ -232,7 +232,7 @@ class DbOperation
                     }
                     return $cat;
                 }else{
-                    $stmt = $this->con->prepare ("SELECT  `id`,`c_id`, `name`, `f_name`, `st_gender`, `contact_no`, `address`, `reference`, `cnic`, `course`,`c_duration`, `ad_date`, `total_fee`, `installment_no`,`first_installment_no`,`advance`,`remaning_amount`, `status`, `st_status` FROM `a_student` WHERE `st_status`='active' AND c_id=(?)");
+                    $stmt = $this->con->prepare ("SELECT  `id`,`c_id`, `name`, `f_name`, `st_gender`, `contact_no`, `address`, `reference`, `cnic`, `course`,`c_duration`, `ad_date`, `total_fee`, `installment_no`,`first_installment_no`,`advance`,`remaning_amount`, `status`, `st_status` FROM `a_student` WHERE `st_status`='active' AND `status`='pending' AND c_id=?");
                     $stmt->bind_param("i",$c_id);
                     $stmt->execute();
                     $stmt->bind_result($id,$c_id,$name,$f_name, $st_gender,$contact_no, $address,$reference, $cnic,$course,$c_duration, $ad_date,$total_fee,$installment_no,$first_installment_no,$advance,$remaning_amount, $status,$st_status);
@@ -1357,6 +1357,43 @@ class DbOperation
                 return $cat;
             }
         }
+
+
+
+                                // Get Main Account by description 
+            function getmaindescription($c_id) {
+                if($c_id == 3){
+                    $stmt = $this->con->prepare("SELECT `type`, `description` FROM `transactions`");
+                    // $stmt->bind_param("i", $c_id);
+                    $stmt->execute();
+                    $stmt->bind_result($type, $description);
+                    $cat = array();
+                    while ($stmt->fetch()) {
+                        $test = array();
+                        $test['type'] = $type;
+                        $test['description'] = $description;
+                        array_push($cat, $test);
+                    }
+                    return $cat;
+                }
+                else{
+                    $stmt = $this->con->prepare("SELECT `type`, `description` FROM `transactions` WHERE c_id=?");
+                    $stmt->bind_param("i", $c_id);
+                    $stmt->execute();
+                    $stmt->bind_result($type, $description);
+                    $cat = array();
+                    while ($stmt->fetch()) {
+                        $test = array();
+                        $test['type'] = $type;
+                        $test['description'] = $description;
+                        // $test['netbalance'] = $netbalance;
+                
+                        array_push($cat, $test);
+                    }
+                    return $cat;
+                }
+            }
+
         // gettransactionsbymainaccount
             // function gettransactionsbymainaccount($a_id,$c_id,$type)
             // {

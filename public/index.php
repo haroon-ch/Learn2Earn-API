@@ -545,6 +545,19 @@ $app = new \Slim\App([
                     $response->getBody()->write(json_encode($result));
                 });
 
+                // get by description
+                $app->post('/getmaindescription',function (Request $request, Response $response)
+                {
+                    $requestData = json_decode($request->getBody());
+                    // $type=$requestData->type;
+                    // $description=$requestData->description;
+                    $c_id=$requestData->c_id;
+                    $db = new DbOperation();
+                    $result=$db->getmaindescription($c_id);
+                    $response->getBody()->write(json_encode($result));
+                });
+
+
                 $app->post('/insertTransactions',function (Request $request, Response $response)
                 {
                 $requestData = json_decode($request->getBody());
