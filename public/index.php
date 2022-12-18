@@ -634,6 +634,17 @@ $app = new \Slim\App([
                 $response->getBody()->write(json_encode($result));
             });
 
+            $app->post('/gettalltrasactions',function (Request $request, Response $response)
+            {
+                $requestData = json_decode($request->getBody());
+                $a_id=$requestData->a_id;
+                $c_id=$requestData->c_id;
+                // $type=$requestData->type;
+                $db = new DbOperation();
+                $result=$db->gettalltrasactions($a_id,$c_id);
+                $response->getBody()->write(json_encode($result));
+            });
+
             // gettransactionsbyexpense
             $app->post('/gettransactionsbyexpense',function (Request $request, Response $response)
             {
@@ -659,6 +670,23 @@ $app = new \Slim\App([
             //     $result=$db->gettransactionsbymainaccountByDate($a_id,$type,$c_id,$t_date);
             //     $response->getBody()->write(json_encode($result));
             // });
+
+        //     $app->post('/get_netbalance',function (Request $request, Response $response)
+        //     {
+        //         $requestData = json_decode($request->getBody());
+        //         $c_id=$requestData->c_id;
+        //         $db = new DbOperation();
+        //         $result=$db->get_netbalance($c_id);
+        //         $response->getBody()->write(json_encode($result));
+        //     });
+
+        $app->get('/get_netbalance/{c_id}' ,function (Request $request, Response $response)
+        {   $c_id = $request->getAttribute('c_id');
+            $db = new DbOperation();
+            $result=$db->get_netbalance($c_id);
+            $response->getBody()->write(json_encode($result));
+        });
+
 
 $app->run();
 ?>

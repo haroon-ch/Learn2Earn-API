@@ -1461,8 +1461,8 @@ class DbOperation
                 if($c_id == 3){
                     $cat3 = array();
                     $stmt = $this->con->prepare("SELECT transactions.t_id, transactions.a_id,transactions.c_id, transactions.debit,
-                     transactions.credit, transactions.netbalance, transactions.type, transactions.description, transactions.t_date,
-                      main_account.name FROM transactions JOIN main_account ON transactions.a_id = main_account.a_id WHERE transactions.a_id = ? AND transactions.type =?");
+                    transactions.credit, transactions.netbalance, transactions.type, transactions.description, transactions.t_date,
+                     main_account.name FROM transactions JOIN main_account ON transactions.a_id = main_account.a_id WHERE transactions.a_id=? AND transactions.type = ? ");
                     $stmt->bind_param("is", $a_id,$type);
                     $stmt->execute();
                     $stmt->bind_result($t_id, $a_id,$c_id, $debit, $credit, $netbalance, $type, $description, $t_date, $name);
@@ -1482,7 +1482,7 @@ class DbOperation
                 array_push($cat, $data);
                 }
                 array_push($cat3, $cat);
-                $stmt = $this->con->prepare("SELECT SUM(debit) as total_debit FROM transactions WHERE a_id = ? AND type = ?");
+                $stmt = $this->con->prepare("SELECT SUM(debit) as total_debit FROM transactions WHERE transactions.a_id =? AND type = ?");
                 $stmt->bind_param("is", $a_id,$type);
                 $stmt->execute();
                 $stmt->bind_result($total_debit);
@@ -1493,7 +1493,7 @@ class DbOperation
                 array_push($cat2, $data);
                 }
                 array_push($cat3, $cat2);
-                $stmt = $this->con->prepare("SELECT SUM(credit) as total_credit FROM transactions WHERE a_id = ? AND type = ? ");
+                $stmt = $this->con->prepare("SELECT SUM(credit) as total_credit FROM transactions WHERE transactions.a_id = ? AND type = ? ");
                 $stmt->bind_param("is", $a_id,$type);
                 $stmt->execute();
                 $stmt->bind_result($total_credit);
@@ -1504,7 +1504,7 @@ class DbOperation
                 array_push($cat2, $data);
                 }
                 array_push($cat3, $cat2);
-                $stmt = $this->con->prepare("SELECT netbalance FROM transactions where t_id = (select MAX(t_id) from transactions WHERE a_id = ? AND type = ?)");
+                $stmt = $this->con->prepare("SELECT netbalance FROM transactions where t_id = (select MAX(t_id) from transactions WHERE transactions.a_id = ? AND  type = ?)");
                 $stmt->bind_param("is", $a_id,$type);
                 $stmt->execute();
                 $stmt->bind_result($netbalance);
@@ -1583,12 +1583,12 @@ class DbOperation
             // gettransactionsbyexpense
             function gettransactionsbyexpense($a_id,$type,$description,$c_id)
             {
-                if($c_id == 3){
+                if($c_id == 3 && $a_id == 3){
                     $cat3 = array();
                     $stmt = $this->con->prepare("SELECT transactions.t_id, transactions.a_id,transactions.c_id, transactions.debit, transactions.credit, transactions.netbalance, transactions.type,
                     transactions.description, transactions.t_date, main_account.name FROM transactions JOIN main_account ON transactions.a_id = main_account.a_id
-                    WHERE transactions.a_id = ? AND transactions.type =? AND transactions.description = ?");
-                    $stmt->bind_param("iss", $a_id,$type,$description);
+                    WHERE  transactions.type =? AND transactions.description = ?");
+                    $stmt->bind_param("ss", $type,$description);
                     $stmt->execute();
                     $stmt->bind_result($t_id, $a_id,$c_id, $debit, $credit, $netbalance, $type, $description, $t_date, $name);
                 $cat = array();
@@ -1607,8 +1607,8 @@ class DbOperation
                 array_push($cat, $data);
                 }
                 array_push($cat3, $cat);
-                $stmt = $this->con->prepare("SELECT SUM(debit) as total_debit FROM transactions WHERE a_id = ? AND type = ? AND description = ?");
-                $stmt->bind_param("iss", $a_id, $type, $description);
+                $stmt = $this->con->prepare("SELECT SUM(debit) as total_debit FROM transactions WHERE  type = ? AND description = ?");
+                $stmt->bind_param("ss",  $type, $description);
                 $stmt->execute();
                 $stmt->bind_result($total_debit);
                 $cat2 = array();
@@ -1618,8 +1618,8 @@ class DbOperation
                 array_push($cat2, $data);
                 }
                 array_push($cat3, $cat2);
-                $stmt = $this->con->prepare("SELECT SUM(credit) as total_credit FROM transactions WHERE a_id = ? AND type = ? AND description = ? ");
-                $stmt->bind_param("iss", $a_id, $type, $description);
+                $stmt = $this->con->prepare("SELECT SUM(credit) as total_credit FROM transactions WHERE  type = ? AND description = ? ");
+                $stmt->bind_param("ss",  $type, $description);
                 $stmt->execute();
                 $stmt->bind_result($total_credit);
                 $cat2 = array();
@@ -1629,8 +1629,8 @@ class DbOperation
                 array_push($cat2, $data);
                 }
                 array_push($cat3, $cat2);
-                $stmt = $this->con->prepare("SELECT netbalance FROM transactions where t_id = (select MAX(t_id) from transactions WHERE a_id = ? AND type = ? AND description = ?)");
-                $stmt->bind_param("iss", $a_id, $type, $description);
+                $stmt = $this->con->prepare("SELECT netbalance FROM transactions where t_id = (select MAX(t_id) from transactions WHERE type = ? AND description = ?)");
+                $stmt->bind_param("ss",  $type, $description);
                 $stmt->execute();
                 $stmt->bind_result($netbalance);
                 $cat2 = array();
@@ -1706,130 +1706,6 @@ class DbOperation
             }
 
 
-                    
-            // function get_alldata_graph($c_id)
-            // {
-            //     if($c_id == 3){
-            //         $cat3 = array();                //   Total expense by last 7 days
-            //         $stmt = $this->con->prepare("select DAYNAME(t_date) as day,transactions.c_id, SUM(netbalance) as total_netbalance from transactions WHERE t_date >= NOW() + INTERVAL -7 DAY AND t_date <  NOW() + INTERVAL  0 DAY group by day(t_date) order by day(t_date)");
-            //         // $stmt->bind_param("i", $c_id);
-            //         $stmt->execute();
-            //         $stmt->bind_result($day,$c_id, $total_netbalance);
-            //     $cat = array();
-            //     while ($stmt->fetch()) {
-            //     $data = array();
-            //     $data['day'] = $day;
-            //     $data['c_id'] = $c_id;
-            //     $data['total_expense'] = $total_netbalance;
-            //     array_push($cat, $data);
-            //     }
-            //     array_push($cat3, $cat);
-            //             //   Total expense by last 7 Month
-            //     $stmt = $this->con->prepare("select date_format(a_date,'%M') as month ,account.c_id,date_format(a_date,'%Y') as year ,SUM(amount) as total_expense from account WHERE a_date >= now()-interval 7 month group by year(a_date),month(a_date) order by year(a_date)");
-            //     // $stmt->bind_param("i", $c_id);
-            //     $stmt->execute();
-            //     $stmt->bind_result($month,$c_id, $year, $total_expense);
-            //     $cat2 = array();
-            //     while ($stmt->fetch()) {
-            //     $data = array();
-            //     $data['month'] = $month;
-            //     $data['c_id'] = $c_id;
-            //     $data['year'] = $year;
-            //     $data['total_expense'] = $total_expense;
-            //     array_push($cat2, $data);
-            //     }
-            //     array_push($cat3, $cat2);        //   Total Installments  by last 7 days
-            //     $stmt = $this->con->prepare("SELECT DAYNAME(date) as day,installments.c_id, SUM(i_amount) as total_installments FROM installments WHERE date >= NOW() + INTERVAL -7 DAY AND date < NOW() + INTERVAL 0 DAY GROUP BY day(date) ORDER BY day(date)");
-            //     // $stmt->bind_param("i", $c_id);
-            //     $stmt->execute();
-            //     $stmt->bind_result($day,$c_id, $total_installments);
-            //     $cat2 = array();
-            //     while ($stmt->fetch()) {
-            //     $data = array();
-            //     $data['day'] = $day;
-            //     $data['c_id'] = $c_id;
-            //     $data['total_installments'] = $total_installments;
-            //     array_push($cat2, $data);
-            //     }
-            //     array_push($cat3, $cat2);   //   Total Installments by last 7 Month
-            //     $stmt = $this->con->prepare("SELECT date_format(date ,'%M') as month,installments.c_id,date_format(date ,'%Y') as year, SUM(i_amount) as total_installments FROM installments WHERE date >= NOW()-INTERVAL 7 month GROUP BY year(date), month(date) ORDER BY year(date),month(date)");
-            //     // $stmt->bind_param("i", $c_id);
-            //     $stmt->execute();
-            //     $stmt->bind_result($month,$c_id, $year , $total_installments);
-            //     $cat2 = array();
-            //     while ($stmt->fetch()) {
-            //     $data = array();
-            //     $data['month'] = $month;
-            //     $data['c_id'] = $c_id;
-            //     $data['year'] = $year;
-            //     $data['total_installments'] = $total_installments;
-            //     array_push($cat2, $data);
-            //     }
-            //     array_push($cat3, $cat2);
-    
-            //     return $cat3;
-            //     }
-            //     else{
-            //         $cat3 = array();                //   Total expense by last 7 days
-            //         $stmt = $this->con->prepare("select DAYNAME(a_date) as day,account.c_id, SUM(amount) as total_expense from account WHERE c_id =? AND a_date >= NOW() + INTERVAL -7 DAY AND a_date <  NOW() + INTERVAL  0 DAY group by day(a_date) order by day(a_date)");
-            //         $stmt->bind_param("i", $c_id);
-            //         $stmt->execute();
-            //         $stmt->bind_result($day,$c_id, $total_expense);
-            //     $cat = array();
-            //     while ($stmt->fetch()) {
-            //     $data = array();
-            //     $data['day'] = $day;
-            //     $data['c_id'] = $c_id;
-            //     $data['total_expense'] = $total_expense;
-            //     array_push($cat, $data);
-            //     }
-            //     array_push($cat3, $cat);
-            //             //   Total expense by last 7 Month
-            //     $stmt = $this->con->prepare("select date_format(a_date,'%M') as month ,account.c_id,date_format(a_date,'%Y') as year ,SUM(amount) as total_expense from account WHERE c_id=? AND a_date >= now()-interval 7 month group by year(a_date),month(a_date) order by year(a_date)");
-            //     $stmt->bind_param("i", $c_id);
-            //     $stmt->execute();
-            //     $stmt->bind_result($month,$c_id, $year, $total_expense);
-            //     $cat2 = array();
-            //     while ($stmt->fetch()) {
-            //     $data = array();
-            //     $data['month'] = $month;
-            //     $data['c_id'] = $c_id;
-            //     $data['year'] = $year;
-            //     $data['total_expense'] = $total_expense;
-            //     array_push($cat2, $data);
-            //     }
-            //     array_push($cat3, $cat2);        //   Total Installments  by last 7 days
-            //     $stmt = $this->con->prepare("SELECT DAYNAME(date) as day,installments.c_id, SUM(i_amount) as total_installments FROM installments WHERE c_id=? AND date >= NOW() + INTERVAL -7 DAY AND date < NOW() + INTERVAL 0 DAY GROUP BY day(date) ORDER BY day(date)");
-            //     $stmt->bind_param("i", $c_id);
-            //     $stmt->execute();
-            //     $stmt->bind_result($day,$c_id, $total_installments);
-            //     $cat2 = array();
-            //     while ($stmt->fetch()) {
-            //     $data = array();
-            //     $data['day'] = $day;
-            //     $data['c_id'] = $c_id;
-            //     $data['total_installments'] = $total_installments;
-            //     array_push($cat2, $data);
-            //     }
-            //     array_push($cat3, $cat2);   //   Total Installments by last 7 Month
-            //     $stmt = $this->con->prepare("SELECT date_format(date ,'%M') as month,installments.c_id,date_format(date ,'%Y') as year, SUM(i_amount) as total_installments FROM installments WHERE c_id=? AND date >= NOW()-INTERVAL 7 month GROUP BY year(date), month(date) ORDER BY year(date),month(date)");
-            //     $stmt->bind_param("i", $c_id);
-            //     $stmt->execute();
-            //     $stmt->bind_result($month,$c_id, $year , $total_installments);
-            //     $cat2 = array();
-            //     while ($stmt->fetch()) {
-            //     $data = array();
-            //     $data['month'] = $month;
-            //     $data['c_id'] = $c_id;
-            //     $data['year'] = $year;
-            //     $data['total_installments'] = $total_installments;
-            //     array_push($cat2, $data);
-            //     }
-            //     array_push($cat3, $cat2);
-    
-            //     return $cat3;
-            //     }
-            // }
 
             // function gettransactionsbymainaccountByDate($a_id,$type, $c_id,$t_date)
             // {
@@ -1951,6 +1827,168 @@ class DbOperation
             //     return $cat3;
             //     }
             // }
+
+
+            function gettalltrasactions($a_id, $c_id)
+            {
+                if($c_id == 3 && $a_id == 3){
+                    $cat3 = array();
+                    $stmt = $this->con->prepare("SELECT transactions.t_id, transactions.a_id,transactions.c_id, transactions.debit,
+                    transactions.credit, transactions.netbalance, transactions.type, transactions.description, transactions.t_date,
+                     main_account.name FROM transactions JOIN main_account ON transactions.a_id = main_account.a_id");
+                    // $stmt->bind_param("i", $a_id);
+                    $stmt->execute();
+                    $stmt->bind_result($t_id, $a_id,$c_id, $debit, $credit, $netbalance, $type, $description, $t_date, $name);
+                $cat = array();
+                while ($stmt->fetch()) {
+                $data = array();
+                $data['t_id'] = $t_id;
+                $data['a_id'] = $a_id;
+                $data['c_id'] = $c_id;
+                $data['debit'] = $debit;
+                $data['credit'] = $credit;
+                $data['netbalance'] = $netbalance;
+                $data['type'] = $type;
+                $data['description'] = $description;
+                $data['t_date'] = $t_date;
+                $data['name'] = $name;
+                array_push($cat, $data);
+                }
+                array_push($cat3, $cat);
+                $stmt = $this->con->prepare("SELECT SUM(debit) as total_debit FROM transactions");
+                // $stmt->bind_param("i", $a_id);
+                $stmt->execute();
+                $stmt->bind_result($total_debit);
+                $cat2 = array();
+                while ($stmt->fetch()) {
+                $data = array();
+                $data['total_debit'] = $total_debit;
+                array_push($cat2, $data);
+                }
+                array_push($cat3, $cat2);
+                $stmt = $this->con->prepare("SELECT SUM(credit) as total_credit FROM transactions");
+                // $stmt->bind_param("i", $a_id);
+                $stmt->execute();
+                $stmt->bind_result($total_credit);
+                $cat2 = array();
+                while ($stmt->fetch()) {
+                $data = array();
+                $data['total_credit'] = $total_credit;
+                array_push($cat2, $data);
+                }
+                array_push($cat3, $cat2);
+                $stmt = $this->con->prepare("SELECT netbalance FROM transactions where t_id = (select MAX(t_id) from transactions)");
+                // $stmt->bind_param("i", $a_id);
+                $stmt->execute();
+                $stmt->bind_result($netbalance);
+                $cat2 = array();
+                while ($stmt->fetch()) {
+                $data = array();
+                $data['netbalance'] = $netbalance;
+                array_push($cat2, $data);
+                }
+                array_push($cat3, $cat2);
+    
+                return $cat3;
+                }
+                else{
+                    $cat3 = array();
+                    $stmt = $this->con->prepare("SELECT transactions.t_id, transactions.a_id,transactions.c_id, transactions.debit,
+                     transactions.credit, transactions.netbalance, transactions.type, transactions.description, transactions.t_date,
+                      main_account.name FROM transactions JOIN main_account ON transactions.a_id = main_account.a_id WHERE transactions.a_id = ? AND transactions.c_id=?");
+                    $stmt->bind_param("ii", $a_id,$c_id);
+                    $stmt->execute();
+                    $stmt->bind_result($t_id, $a_id,$c_id, $debit, $credit, $netbalance, $type, $description, $t_date, $name);
+                $cat = array();
+                while ($stmt->fetch()) {
+                $data = array();
+                $data['t_id'] = $t_id;
+                $data['a_id'] = $a_id;
+                $data['c_id'] = $c_id;
+                $data['debit'] = $debit;
+                $data['credit'] = $credit;
+                $data['netbalance'] = $netbalance;
+                $data['type'] = $type;
+                $data['description'] = $description;
+                $data['t_date'] = $t_date;
+                $data['name'] = $name;
+                array_push($cat, $data);
+                }
+                array_push($cat3, $cat);
+                $stmt = $this->con->prepare("SELECT SUM(debit) as total_debit FROM transactions WHERE a_id = ? AND c_id=?");
+                $stmt->bind_param("ii", $a_id,$c_id);
+                $stmt->execute();
+                $stmt->bind_result($total_debit);
+                $cat2 = array();
+                while ($stmt->fetch()) {
+                $data = array();
+                $data['total_debit'] = $total_debit;
+                array_push($cat2, $data);
+                }
+                array_push($cat3, $cat2);
+                $stmt = $this->con->prepare("SELECT SUM(credit) as total_credit FROM transactions WHERE a_id = ? AND c_id=?");
+                $stmt->bind_param("ii", $a_id,$c_id);
+                $stmt->execute();
+                $stmt->bind_result($total_credit);
+                $cat2 = array();
+                while ($stmt->fetch()) {
+                $data = array();
+                $data['total_credit'] = $total_credit;
+                array_push($cat2, $data);
+                }
+                array_push($cat3, $cat2);
+                $stmt = $this->con->prepare("SELECT netbalance FROM transactions where t_id = (select MAX(t_id) from transactions WHERE a_id = ? AND c_id=?)");
+                $stmt->bind_param("ii", $a_id,$c_id);
+                $stmt->execute();
+                $stmt->bind_result($netbalance);
+                $cat2 = array();
+                while ($stmt->fetch()) {
+                $data = array();
+                $data['netbalance'] = $netbalance;
+                array_push($cat2, $data);
+                }
+                array_push($cat3, $cat2);
+    
+                return $cat3;
+                }
+            }
+
+            // getall net balance from account
+
+            function get_netbalance($c_id) {
+                if($c_id == 3){
+                    $stmt = $this->con->prepare("SELECT  `c_id`, `name`, `netbalance` FROM `main_account`");
+                    // $stmt->bind_param("i", $c_id);
+                    $stmt->execute();
+                    $stmt->bind_result($c_id,$name, $netbalance);
+                    $cat = array();
+                    while ($stmt->fetch()) {
+                        $test = array();
+                        $test['name'] = $name;
+                        $test['netbalance'] = $netbalance;
+                        array_push($cat, $test);
+                    }
+                    return $cat;
+                }
+                else{
+                    $stmt = $this->con->prepare("SELECT  `c_id`, `name`, `netbalance` FROM `main_account` WHERE c_id=?");
+                    $stmt->bind_param("i", $c_id);
+                    $stmt->execute();
+                    $stmt->bind_result($c_id, $name, $netbalance);
+                    $cat = array();
+                    while ($stmt->fetch()) {
+                        $test = array();
+                        $test['name'] = $name;
+                        $test['netbalance'] = $netbalance;
+                        // $test['netbalance'] = $netbalance;
+                
+                        array_push($cat, $test);
+                    }
+                    return $cat;
+                }
+            }
+
+
 
 
 }   
