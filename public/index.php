@@ -658,7 +658,6 @@ $app = new \Slim\App([
                 $response->getBody()->write(json_encode($result));
             });
 
-
             // $app->post('/gettransactionsbymainaccountByDate',function (Request $request, Response $response)
             // {
             //     $requestData = json_decode($request->getBody());

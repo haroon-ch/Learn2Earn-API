@@ -18,5 +18,4 @@ define('ORDER_NOT_PLACED',103);
 define('PET_ADDED',101);
 define('ORDER_PLACED',101);
 
-
 ?>
