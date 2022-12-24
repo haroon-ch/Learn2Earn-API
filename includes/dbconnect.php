@@ -11,7 +11,7 @@ class DbConnect
  
     }
     
- 
+
     //This method will connect to the database
     function connect()
     {

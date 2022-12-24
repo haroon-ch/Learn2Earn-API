@@ -657,6 +657,7 @@ $app = new \Slim\App([
                 $result=$db->gettransactionsbyexpense($a_id, $type,$description,$c_id);
                 $response->getBody()->write(json_encode($result));
             });
+            
 
             // $app->post('/gettransactionsbymainaccountByDate',function (Request $request, Response $response)
             // {
