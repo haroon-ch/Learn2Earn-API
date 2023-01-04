@@ -1456,7 +1456,7 @@ class DbOperation
             // return $cat3;
             // }
 
-        
+
         
             function gettransactionsbymainaccount($a_id,$type, $c_id)
             {
