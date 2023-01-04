@@ -458,6 +458,7 @@ $app = new \Slim\App([
             });
 
             // get account data by type
+            
             // $app->post('/getaccountsbytype',function (Request $request,Response $response)
             // {
             //     $requestData = json_decode($request->getBody());
@@ -523,7 +524,6 @@ $app = new \Slim\App([
                 //     $result=$db->getstudentbystatus($st_status);
                 //     $response->getBody()->write(json_encode($result));
                 // });
-
 
                     // Account Page Api start
 
@@ -600,6 +600,7 @@ $app = new \Slim\App([
             //     $result=$db->getTransactions($a_id);
             //     $response->getBody()->write(json_encode($result));
             // });
+
                 //done
             $app->post('/getTransactions',function (Request $request, Response $response)
             {
@@ -657,7 +658,7 @@ $app = new \Slim\App([
                 $result=$db->gettransactionsbyexpense($a_id, $type,$description,$c_id);
                 $response->getBody()->write(json_encode($result));
             });
-            
+        
 
             // $app->post('/gettransactionsbymainaccountByDate',function (Request $request, Response $response)
             // {
