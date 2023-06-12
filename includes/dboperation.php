@@ -673,7 +673,8 @@ class DbOperation
                    }
                    return $cat;
                 }
-            }                                    // account page api
+            }                    
+                            // account page api
 
             // get graph data by date 
         
